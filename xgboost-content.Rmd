@@ -28,7 +28,7 @@ text-align: justify}
 
 Boosting is an ensemble method of converting weak learners into strong learners. Weak and strong refer to a measure how correlated are the learners to the actual target variable[^1]. In boosting, each training sample are used to train one unit of decision tree and picked with replacement over-weighted data. The trees will learn from predecessors and updates the residuals error.
 
-![](assets/boosting.png)
+
 
 ## Learning Objectives
 
@@ -69,7 +69,10 @@ options(scipen = 99)
 
 The idea of bagging is creating many subsets of training sample with replacement, each observation has the same probability to picked as sample. Then, each training sample are used to train one unit of decision tree and use the average of all the predictions. In boosting, each training sample are used to train one unit of decision tree and picked with replacement over-weighted data. The trees will learn from predecessors and updates the residuals error. After these weak learners are trained, a weighted average of their estimates are taken for the final predictions at the end[^2].
 
-![](assets/sequantial.png)
+```{r, echo=FALSE}
+knitr::include_graphics("assets/boostingg.png")
+```
+
 
 # Boosting Method
 
@@ -90,7 +93,10 @@ XGBoost was formulated by Tianqi Chen which started as a research project a part
 # How XGBoost works?
 
 
-![](assets/xgboost.png)
+```{r, echo=FALSE}
+knitr::include_graphics("assets/xgboost.png")
+```
+
 
 System Optimization: [^4]
 
@@ -110,28 +116,28 @@ XGBoost has been designed to efficiently reduce computing time and allocate an o
 
 The biggest advantage of xgboost is regularization. Regularization is a technique used to avoid overfitting in linear and tree based models which limits, regulates or shrink the estimated coefficient towards zero.
 
-5. Handling missing value *
+5. Handles missing value 
 
-This algorithm has important features of handing missing values. The missing values are treated in such a manner that if there exists any trend in missing values, it is captured by the model.
+This algorithm has important features of handling missing values by learns the best direction for missing values. The missing values are treated them to combine a sparsity-aware split finding algorithm to handle different types of sparsity patterns in data.
 
-6. Cross validation
+6. Built-in cross validation
 
 The algorithm comes with built in cross validation method at each iteration, taking away the need to explicitly program this search and to specify the exact number of boosting iterations required in a single run.
 
 
 ## Regularization and training loss
 
-Pada linear regresi kita memiliki persamaan berikut:
+<!-- Pada linear regresi kita memiliki persamaan berikut: -->
 
-$\hat{y}_i=\sum_{j}\theta _jx_{ij}$
+<!-- $\hat{y}_i=\sum_{j}\theta _jx_{ij}$ -->
 
-Dimana $\theta$ merupakan parameter koefisien untuk setiap prediktor.
+<!-- Dimana $\theta$ merupakan parameter koefisien untuk setiap prediktor. -->
 
 Xgboost melakukan teknik regularisasi dengan cara memberikan penalti pada loss function guna mencegah adanya overfitting.
 
 $obj(\theta )= L(\theta )+\Omega (\theta )$
 
-Dimana $L$ merupakan `training loss function` dan $\Omega$ merupakan regularisasi. `Training loss function` menunjukkan seberapa baik model memprediksi data train,  $\Omega$ will reduce the complexity of the tree functions.
+Where $L$ is `training loss function` and $\Omega$ is regularization. `Training loss function` measures how well model fit on training data,  $\Omega$ will reduce the complexity of the tree functions.
 
 
 Untuk kasus regresi, `training loss function` diperoleh dari nilai `Mean Squared Error`:
@@ -288,7 +294,7 @@ The most important thing when we work with XGBoost is converting the data to Dma
 # convert data to matrix
 train_matrix <- data.matrix(data_train[,-2])
 test_matrix <- data.matrix(data_test[,-2])
-# covnert data to Dmatrix
+# convert data to Dmatrix
 dtrain <- xgb.DMatrix(data = train_matrix, label = label_train)
 dtest <- xgb.DMatrix(data = test_matrix, label = label_test)
 ```
@@ -435,3 +441,14 @@ In this article, we described the lesson how to builing XGBoost model
 [^4] : [XGBoost Algorithm](source: https://towardsdatascience.com/https-medium-com-vishalmorde-xgboost-algorithm-long-she-may-rein-edd9f99be63d)
 [^5] : [Parameter Tuning in R](https://www.hackerearth.com/practice/machine-learning/machine-learning-algorithms/beginners-tutorial-on-xgboost-parameter-tuning-r/tutorial/)
 
+
+
+
+```{r}
+product <- c("Ajeng, david","Tanesya, Tiara","Doyo","Iqbal",
+            "Husain, Tomy","Ina","Sitta, Wulan",
+            "Arga, Joe", "Nabiilah",
+            "Fafil, Lita")
+sample(product,1)
+
+```
