@@ -406,19 +406,28 @@ library(caret)
 confusionMatrix(as.factor(xgbpred), as.factor(label_test))
 ```
 
-
+let's check the variable importance from the model:
 ```{r}
 var_imp <- xgb.importance(model = xgb1,
                           feature_names = dimnames(dtrain)[[2]])
 var_imp %>% 
-  mutate_if(is.numeric, round, digits = 4)
+  mutate_if(is.numeric, round, digits = 2)
 
 ```
+
+The function of `xgb.importance`displays the result importance values calculated with different importance metrics:
+
+- The **gain** value means the percentage contribution of the feature for each tree in the model
+
+- The **cover** value means the percentage represents the number of observations for each feature from all trees. From example, if we have 100 observations with 3 tree and each tree have 5, 8, and 10 observations for feature "A". The cover value will calculate 5+8+10 = 23 observations from all trees for each feature. In this case, the feature "A" has a 0.23 cover value.
+
+- The **frequency** value means the percentage representing the number of times a feature will splits in the trees of the model. For example, feature "A" occurred in 3 splits, 2 splits, and 2 splits for each tree. So the value of frequency feature "A" is 3+2+2=7 splits divide with all total numbers splits for all features.
 
 ```{r}
-xgb.ggplot.importance(var_imp,top_n = 10)
+xgb.ggplot.importance(var_imp,top_n = 10) + theme_minimal()
 ```
 
+The graph shows the variable importance used the gain value by default and it also displays the cluster of features that have similar feature importances value. From 10 above features means their features have a significant impact on the result of prediction.
 
 Next, we evaluate the perfomance model on the ROC curver
 ```{r}
@@ -429,9 +438,9 @@ plot(roc_result, col = "red", lwd = 2,
      main = sprintf("test set AUCROC = %.03f", auc(roc_result)))
 ```
 
-### Conclusion
+### Conclusion *
 
-In this article, we described the lesson how to builing XGBoost model
+In this article, we described the lesson how to building XGBoost model
 
 # Reference
 
