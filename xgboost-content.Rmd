@@ -98,7 +98,7 @@ knitr::include_graphics("assets/xgboost.png")
 ```
 
 
-System Optimization: [^4]
+System Optimization: [^5]
 
 1. Parallelized tree building
 
@@ -127,24 +127,17 @@ The algorithm comes with built in cross validation method at each iteration, tak
 
 ## Regularization and training loss
 
-<!-- Pada linear regresi kita memiliki persamaan berikut: -->
-
-<!-- $\hat{y}_i=\sum_{j}\theta _jx_{ij}$ -->
-
-<!-- Dimana $\theta$ merupakan parameter koefisien untuk setiap prediktor. -->
-
-Xgboost melakukan teknik regularisasi dengan cara memberikan penalti pada loss function guna mencegah adanya overfitting.
+XGBoost offers additional regularization term controls the complexity of the model, which help us to avoid overfitting. The objective function is to measure how well the model fit the training data. They consist of two parts: training loss and the regularization term:
 
 $obj(\theta )= L(\theta )+\Omega (\theta )$
 
-Where $L$ is `training loss function` and $\Omega$ is regularization. `Training loss function` measures how well model fit on training data,  $\Omega$ will reduce the complexity of the tree functions.
+Where $L$ is `training loss function` and $\Omega$ is regularization. `Training loss function` measures how well model fit on training data,  $\Omega$ will reduce the complexity of the tree functions.[^3]
 
-
-Untuk kasus regresi, `training loss function` diperoleh dari nilai `Mean Squared Error`:
+For regression case, `training loss function` will obtain from `Mean Squared Error` value:
 
 $L(\theta ) = {\sum_i^{n}(y_i-\hat{y}_i)^2}$
 
-Sedangkan untuk kasus logistic regression, `training loss function` diperoleh dari nilai berikut:
+Another loss function for classification case:
 
 $L(\theta ) = {\sum_i[y_iln(1+e^{-\hat{y}_i})+(1-y_i)ln(1+e^{\hat{y}_i})]}$
 
@@ -289,7 +282,7 @@ label_train <- as.numeric(as.character(data_train$is_canceled))
 label_test <- as.numeric(as.character(data_test$is_canceled))
 ```
 
-The most important thing when we work with XGBoost is converting the data to Dmatrix:
+The most important thing when we work with XGBoost is converting the data to Dmatrix, because XGBoost requires a matrix input for the features.
 ```{r}
 # convert data to matrix
 train_matrix <- data.matrix(data_train[,-2])
@@ -302,7 +295,7 @@ dtest <- xgb.DMatrix(data = test_matrix, label = label_test)
 
 #### Tuning Parameters
 
-There is no benchmark to define the ideal parameters because it will depend on your data and specific problem. XGBoost Parameters can defined into three categories:[^5]
+There is no benchmark to define the ideal parameters because it will depend on your data and specific problem. XGBoost Parameters can defined into three categories:[^6]
 
 ##### General Parameters
 
@@ -446,9 +439,10 @@ In this article, we described the lesson how to building XGBoost model
 
 [^1] : [XGBoost, a Top Machine Learning Method on Kaggle](https://www.kdnuggets.com/2017/10/xgboost-top-machine-learning-method-kaggle-explained.html)
 [^2] : [XGBoost: The Excalibur for Everyone](https://towardsdatascience.com/xgboost-the-excalibur-for-everyone-8009bd015f1e)
-[^3] : [Machine Learning Basics-Gradient Boosting & XGBoost](https://www.shirin-glander.de/2018/11/ml_basics_gbm/)
-[^4] : [XGBoost Algorithm](source: https://towardsdatascience.com/https-medium-com-vishalmorde-xgboost-algorithm-long-she-may-rein-edd9f99be63d)
-[^5] : [Parameter Tuning in R](https://www.hackerearth.com/practice/machine-learning/machine-learning-algorithms/beginners-tutorial-on-xgboost-parameter-tuning-r/tutorial/)
+[^3] : [Introduction to Boosted Trees](https://xgboost.readthedocs.io/en/latest/tutorials/model.html#)
+[^4] : [Machine Learning Basics-Gradient Boosting & XGBoost](https://www.shirin-glander.de/2018/11/ml_basics_gbm/)
+[^5] : [XGBoost Algorithm](source: https://towardsdatascience.com/https-medium-com-vishalmorde-xgboost-algorithm-long-she-may-rein-edd9f99be63d)
+[^6] : [Parameter Tuning in R](https://www.hackerearth.com/practice/machine-learning/machine-learning-algorithms/beginners-tutorial-on-xgboost-parameter-tuning-r/tutorial/)
 
 
 
