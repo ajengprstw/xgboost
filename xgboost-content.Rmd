@@ -311,9 +311,10 @@ For regression problems, we can use `gbtree` and `gblinear`. In `gblinear`, it b
 
 To enable parallel computing. The default is the maximum number of cores available
 
-3. silent
+3. verbosity
 
-The default
+Verbosity to display warning messages.The default value is 1 (warning), 0 for silent, 2 for info, and 3 for debug.
+
 
 ##### Booster Parameters:
 
@@ -353,7 +354,12 @@ The range of colsample_bytree is 0 to 1 and default value is 1. It controls the 
 Sets and evaluates the learning process of booster from the given data.
 
 1. Objective
+- `reg:squarederror` for regression with squared loss
+- `binary:logistic`  for binary classification
+
 2. eval_metric
+
+Evaluation metrics for validaton data. The default is RMSE for regression case and error for classification case.
 
 Next, we define the parameter will be used:
 
