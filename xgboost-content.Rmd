@@ -309,7 +309,11 @@ For regression problems, we can use `gbtree` and `gblinear`. In `gblinear`, it b
 
 2. nthread
 
+To enable parallel computing. The default is the maximum number of cores available
+
 3. silent
+
+The default
 
 ##### Booster Parameters:
 
@@ -331,9 +335,9 @@ it refers to controls the maximum number of iterations.
 
 Maximum depth of a tree. The range of max_depth is 0 to infinite and default value is 6, increasing this value will make the model more complex and more likely to overfit.
 
-5. Min_child_weight *
+5. Min_child_weight 
 
-The range of min_child_weight is 0 to infinite and default value is 1. In regression, it refers to the minimum number of instances required in a child node. In classification, if the leaf node has a minimum sum of instance weight (calculated by second-order partial derivative) lower than min_child_weight, the tree splitting stops.
+The range of min_child_weight is 0 to infinite and default value is 1. If the leaf node has a minimum sum of instance weight lower than min_child_weight in the tree partition step than the process of splitting the tree will stop growing.
 
 6. subsample
 
