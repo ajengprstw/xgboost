@@ -532,7 +532,8 @@ xgb1 <- xgb.train (params = params,
                    print_every_n = 100, 
                    early_stoping_rounds = 10, 
                    maximize = F , 
-                   eval_metric = "error")
+                   eval_metric = "error",
+                   verbosity = 0)
 toc()
 
 xgbpred_prob <-predict(object = xgb1, newdata = dtest)

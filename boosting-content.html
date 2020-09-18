@@ -3310,7 +3310,7 @@ text-align: justify}
 #&gt;  iter train_error_mean train_error_std test_error_mean test_error_std
 #&gt;   114        0.1217898    0.0009316736       0.1317934    0.002072701</code></pre>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>#&gt; 59.71 sec elapsed</code></pre>
+<pre><code>#&gt; 46.57 sec elapsed</code></pre>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">tic</span>()</a>
 <a class="sourceLine" id="cb28-2" title="2">xgb1 &lt;-<span class="st"> </span><span class="kw">xgb.train</span> (<span class="dt">params =</span> params, </a>
 <a class="sourceLine" id="cb28-3" title="3">                   <span class="dt">data =</span> dtrain, </a>
@@ -3319,20 +3319,13 @@ text-align: justify}
 <a class="sourceLine" id="cb28-6" title="6">                   <span class="dt">print_every_n =</span> <span class="dv">100</span>, </a>
 <a class="sourceLine" id="cb28-7" title="7">                   <span class="dt">early_stoping_rounds =</span> <span class="dv">10</span>, </a>
 <a class="sourceLine" id="cb28-8" title="8">                   <span class="dt">maximize =</span> F , </a>
-<a class="sourceLine" id="cb28-9" title="9">                   <span class="dt">eval_metric =</span> <span class="st">&quot;error&quot;</span>)</a></code></pre></div>
-<pre><code>#&gt; [09:57:06] WARNING: amalgamation/../src/learner.cc:480: 
-#&gt; Parameters: { early_stoping_rounds } might not be used.
-#&gt; 
-#&gt;   This may not be accurate due to some parameters are only used in language bindings but
-#&gt;   passed down to XGBoost core.  Or some parameters are not used but slip through this
-#&gt;   verification. Please open an issue if you find above cases.
-#&gt; 
-#&gt; 
-#&gt; [1]  val-error:0.157641  train-error:0.158900 
+<a class="sourceLine" id="cb28-9" title="9">                   <span class="dt">eval_metric =</span> <span class="st">&quot;error&quot;</span>,</a>
+<a class="sourceLine" id="cb28-10" title="10">                   <span class="dt">verbosity =</span> <span class="dv">0</span>)</a></code></pre></div>
+<pre><code>#&gt; [1]  val-error:0.157641  train-error:0.158900 
 #&gt; [101]    val-error:0.125644  train-error:0.121533 
 #&gt; [114]    val-error:0.124011  train-error:0.119858</code></pre>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>#&gt; 11.49 sec elapsed</code></pre>
+<pre><code>#&gt; 9.84 sec elapsed</code></pre>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1">xgbpred_prob &lt;-<span class="kw">predict</span>(<span class="dt">object =</span> xgb1, <span class="dt">newdata =</span> dtest)</a>
 <a class="sourceLine" id="cb32-2" title="2">xgbpred &lt;-<span class="st"> </span><span class="kw">ifelse</span> (xgbpred_prob <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">0</span>)</a></code></pre></div>
 <p>In this section, we evaluate the performance of XGBoost model</p>
