@@ -52,6 +52,9 @@ The goal of this article is to help you:
 - Understand how XGBoost algorithm works    
 - Implement AdaBoost and Xgboost in business case    
 
+```{r, echo=FALSE}
+knitr::include_graphics("assets/concept_map.png")
+```
 
 ## Library and setup
 
@@ -66,10 +69,6 @@ library(tidymodels)
 library(inspectdf)
 library(caret)
 theme_set(theme_pander())
-```
-
-```{r, echo=FALSE}
-knitr::include_graphics("assets/concept_map.png")
 ```
 
 # Bagging vs Boosting
