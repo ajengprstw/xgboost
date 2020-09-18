@@ -22,12 +22,24 @@ text-align: justify}
 </style>
 
 
+```{r setup, include=FALSE}
+# clear-up the environment
+rm(list = ls())
+# chunk options
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center",
+  comment = "#>"
+)
+options(scipen = 99)
+```
+
 # Introduction {.tabset}
 
 ## What is boosting?
 
 Boosting is an ensemble method of converting weak learners into strong learners. Weak and strong refer to a measure how correlated are the learners to the actual target variable[^1]. In boosting, each training sample are used to train one unit of decision tree and picked with replacement over-weighted data. The trees will learn from predecessors and updates the residuals error.
-
 
 
 ## Learning Objectives
@@ -48,21 +60,16 @@ library(tidyverse)
 library(rsample)
 library(xgboost)
 library(ggthemes)
+library(tictoc)
+library(fastAdaboost)
+library(tidymodels)
+library(inspectdf)
+library(caret)
 theme_set(theme_pander())
 ```
 
-
-```{r setup, include=FALSE}
-# clear-up the environment
-rm(list = ls())
-# chunk options
-knitr::opts_chunk$set(
-  message = FALSE,
-  warning = FALSE,
-  fig.align = "center",
-  comment = "#>"
-)
-options(scipen = 99)
+```{r, echo=FALSE}
+knitr::include_graphics("assets/concept_map.png")
 ```
 
 # Bagging vs Boosting
@@ -70,6 +77,7 @@ options(scipen = 99)
 The idea of bagging is creating many subsets of training sample with replacement, each observation has the same probability to picked as sample. Then, each training sample are used to train one unit of decision tree and use the average of all the predictions. In boosting, each training sample are used to train one unit of decision tree and picked with replacement over-weighted data. The trees will learn from predecessors and updates the residuals error. After these weak learners are trained, a weighted average of their estimates are taken for the final predictions at the end[^2].
 
 ```{r, echo=FALSE}
+knitr::include_graphics("assets/bagging.png")
 knitr::include_graphics("assets/boostingg.png")
 ```
 
@@ -84,7 +92,7 @@ Adaptive boosting was formulated by Yoav Freund and Robet Schapire. AdaBoost was
 
 ### How AdaBoost Works?
 
-We can split the idea of AdaBoost into 3 big consept : 
+We can split the idea of AdaBoost into 3 big concept : 
 
 #### 1. Used Stump as Weak Learners 
 
@@ -105,7 +113,7 @@ In AdaBoost algorithm, each stump has a different weight, the weight for each st
 
 ![](assets/ada3.png)
 
-### Case Example : Hotel Booking Cancellation Prediction
+### Case Example using AdaBoost
 
 The hotel is one of the lodgings most often used when traveling. With limited hotel capacity, canceling a reservation can be detrimental to the person providing the hotel service. In this case, we will predict hotel cancellations using data [Hotel Reservation Requests](https://www.kaggle.com/jessemostipak/hotel-booking-demand) taken from Kaggle.
 
@@ -206,7 +214,6 @@ booking <- booking %>%
 Before we go further, we need to check if there are any missing values in data. We can used `inspect_na()` function from `inspectdf` package to check the missing value. 
 
 ```{r}
-library(inspectdf)
 booking %>% 
   inspect_na()
 ```
@@ -251,7 +258,6 @@ Class with label 0 has a proportion of about 63% of the data while class with la
 We’ll create our training and testing data using `initial_split` function
 
 ```{r}
-library(tidymodels)
 set.seed(100)
 splitted <- initial_split(booking, prop = 0.8,strata = is_canceled)
 data_train <- training(splitted)
@@ -265,7 +271,7 @@ The function used to create the AdaBoost model is `adaboost()` from the `fastAda
 - `nIter`: Number of stumps used on the model     
 
 ```{r eval=F}
-library(fastAdaboost)
+
 model_ada <- adaboost(formula = is_canceled~.,
                       data = data_train, 
                       nIter = 100)
@@ -273,7 +279,7 @@ model_ada <- adaboost(formula = is_canceled~.,
 ```
 
 
-```{r echo=F, eval=F}
+```{r echo=F, eval = F}
 # read kalau membutuhkan aja
 model_ada <- readRDS("adamodel2.rds")
 ```
@@ -312,7 +318,6 @@ the predicted object has several components :
 Now let's check how good our model using confusion matrix
 
 ```{r}
-library(caret)
 confusionMatrix(data = pred_hotel$class, reference = data_test$is_canceled, positive = "1")
 ```
 Based on the confusion matrix above, we know that the accuracy of model is 0.88. Since we know that our data is dominated by the class labeled 0 (67%) we have to use another metrics to find out how well our model predicts the two classes. we're going to use the AUC.
@@ -325,16 +330,13 @@ pred_df <- pred_hotel$prob %>%
   mutate(predicted = pred_hotel$class, 
          actual = data_test$is_canceled)
 
-roc_auc(data = pred_df, truth = actual,class1) 
+auc_ada <- roc_auc(data = pred_df, truth = actual,class1) 
+auc_ada
 ```
 The AUC results show that the model formed is good at predicting the target class, this is indicated by the AUC value of 0.95 (the closer to 1 the better). 
 
-AdaBoost has a lot of advantages, mainly it is easier to use with less need for tweaking parameters unlike algorithms like XGBoost. AdaBoost also  can reduce the variance in testing data.  
+AdaBoost has a lot of advantages, mainly it is easier to use with less need for tweaking parameters unlike algorithms like XGBoost. AdaBoost also can reduce the variance in testing data.  
 
-
-## Gradient Boosting Model
-
-Gradient boosting doesn't modify the sample distribution and performs shortcomings by using gradients in the loss function. The loss function is a measure indicating how good are model's coefficients are at fitting the underlying data
 
 ## XGBoost
 
@@ -391,17 +393,11 @@ Another loss function for classification case:
 
 $L(\theta ) = {\sum_i[y_iln(1+e^{-\hat{y}_i})+(1-y_i)ln(1+e^{\hat{y}_i})]}$
 
-## Business use case
-
-```{r}
-booking <- read.csv("data_input/hotel_bookings.csv", stringsAsFactors = T) 
-head(booking)
-```
+## Case Example using XGBoost
 
 ### Modelling
 
 ```{r}
-library(tidymodels)
 set.seed(100)
 splitted <- initial_split(booking, prop = 0.8,strata = is_canceled)
 data_train <- training(splitted)
@@ -462,23 +458,27 @@ The range of eta is 0 to 1 and default value is 0.3. It controls the maximum num
 
 The range of gamma is 0 to infinite and default value is 0 (no regularization). The higher gamma is the higher regularization, regularization means penalizing large coefficients that don't improve the model's performance.
 
-3. nrounds *
+3. nrounds 
 
 it refers to controls the maximum number of iterations.
 
-4. max_depth
+4. nfold
+
+The number of observation data is randomly partitioned into `nfold` equal size subsamples
+
+5. max_depth
 
 Maximum depth of a tree. The range of max_depth is 0 to infinite and default value is 6, increasing this value will make the model more complex and more likely to overfit.
 
-5. Min_child_weight 
+6. Min_child_weight 
 
 The range of min_child_weight is 0 to infinite and default value is 1. If the leaf node has a minimum sum of instance weight lower than min_child_weight in the tree partition step than the process of splitting the tree will stop growing.
 
-6. subsample
+7. subsample
 
 The range of subsample is 0 to 1 and default value is 1. It controls the number of ratio observations to a tree. If the value is set to 0.5 means that XGboost would randomly sample half of the training data prior to growing trees and this will prevent overfitting. subsample will occur once in every boosting iteration.
 
-7. colsampe_bytree
+8. colsampe_bytree
 
 The range of colsample_bytree is 0 to 1 and default value is 1. It controls the subsample ratio of columns when constructing each tree.
 
@@ -501,8 +501,8 @@ Next, we define the parameter will be used:
 params <- list(booster = "gbtree",
                objective = "binary:logistic",
                eta=0.1, 
-               gamma=5, 
-               max_depth=6, 
+               gamma=10, 
+               max_depth=10, 
                min_child_weight=1, 
                subsample=1, 
                colsample_bytree=1)
@@ -510,20 +510,22 @@ params <- list(booster = "gbtree",
 
 One of the simplest way to see the training progress is to set the verbose option as `TRUE`.
 ```{r}
+tic()
 xgbcv <- xgb.cv( params = params, 
                  data = dtrain,
                  nrounds = 1000, 
-                 nfold = 5, 
                  showsd = T, 
+                 nfold = 5,
                  stratified = T, 
                  print_every_n = 50, 
                  early_stopping_rounds = 20, 
                  maximize = F)
-print(xgbcv, verbose = T)
+print(xgbcv)
+toc()
 ```
 
-
 ```{r}
+tic()
 xgb1 <- xgb.train (params = params, 
                    data = dtrain, 
                    nrounds = xgbcv$best_iteration, 
@@ -532,14 +534,14 @@ xgb1 <- xgb.train (params = params,
                    early_stoping_rounds = 10, 
                    maximize = F , 
                    eval_metric = "error")
+toc()
 
-xgbpred <- predict (xgb1,dtest)
-xgbpred <- ifelse (xgbpred > 0.5,1,0)
+xgbpred_prob <-predict(object = xgb1, newdata = dtest)
+xgbpred <- ifelse (xgbpred_prob > 0.5,1,0)
 ```
 
 In this section, we evaluate the performance of XGBoost model
 ```{r}
-library(caret)
 confusionMatrix(as.factor(xgbpred), as.factor(label_test))
 ```
 
@@ -568,34 +570,45 @@ The graph shows the variable importance used the gain value by default and it al
 
 Next, we evaluate the perfomance model on the ROC curver
 ```{r}
-library(AUC)
-roc_result <- roc(predictions = as.factor(xgbpred),
-    labels = as.factor(label_test))
-plot(roc_result, col = "red", lwd = 2,
-     main = sprintf("test set AUCROC = %.03f", auc(roc_result)))
+xgb_result <- data.frame(class1 = xgbpred_prob, actual = as.factor(label_test))
+
+auc_xgb <- roc_auc(data = xgb_result, truth = actual,class1) 
+
+result <- rbind(auc_ada, auc_xgb) %>% 
+          mutate(model = c("AdaBoost", "XGBoost")) %>% 
+          select(model, everything())
+result
 ```
 
-### Conclusion *
+The AUC results show that AdaBoost and XGBoost model have similar value 0.94 and 0.95. To obtain the AdaBoost model we need to run model for 60 minutes, while the XGBoost model only need ~60 seconds. We can say that XGBoost works better than AdaBoost for speed.
 
-In this article, we described the lesson how to building XGBoost model
+### Conclusion
+
+In this article, we described the lesson on how to building and how AdaBoost and XGBoost model works. We can conclude several points:
+
+- Both of two algorithms are built based on converting weak learners to a strong learner
+
+- AdaBoost has only a few hyperparameters to improve the model but this model is easy to understand and to visualize
+
+- The decision which algorithm will be used depends on our data set, for low noise data and timeliness of result is not the main concern, we can use AdaBoost model
+
+- For complexity and high dimension data, XGBoost performs works better than Adaboost because XGBoost have system optimizations.
+
 
 # Reference
 
 [^1] : [XGBoost, a Top Machine Learning Method on Kaggle](https://www.kdnuggets.com/2017/10/xgboost-top-machine-learning-method-kaggle-explained.html)
+
 [^2] : [XGBoost: The Excalibur for Everyone](https://towardsdatascience.com/xgboost-the-excalibur-for-everyone-8009bd015f1e)
+
 [^3] : [Introduction to Boosted Trees](https://xgboost.readthedocs.io/en/latest/tutorials/model.html#)
+
 [^4] : [Machine Learning Basics-Gradient Boosting & XGBoost](https://www.shirin-glander.de/2018/11/ml_basics_gbm/)
+
 [^5] : [XGBoost Algorithm](source: https://towardsdatascience.com/https-medium-com-vishalmorde-xgboost-algorithm-long-she-may-rein-edd9f99be63d)
+
 [^6] : [Parameter Tuning in R](https://www.hackerearth.com/practice/machine-learning/machine-learning-algorithms/beginners-tutorial-on-xgboost-parameter-tuning-r/tutorial/)
 
 
 
 
-```{r}
-product <- c("Ajeng, david","Tanesya, Tiara","Doyo","Iqbal",
-            "Husain, Tomy","Ina","Sitta, Wulan",
-            "Arga, Joe", "Nabiilah",
-            "Fafil, Lita")
-sample(product,1)
-
-```
